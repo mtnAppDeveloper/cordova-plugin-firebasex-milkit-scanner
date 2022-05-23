@@ -1,5 +1,5 @@
 {
-  "name": "cordova-plugin-firebasex",
+  "name": "cordova-plugin-firebasex-mlkit-scanner",
   "version": "7.0.1",
   "description": "Cordova plugin for Google Firebase",
   "types": "./types/index.d.ts",

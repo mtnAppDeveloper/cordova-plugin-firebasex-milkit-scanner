@@ -9,7 +9,9 @@ interface IChannelOptions {
     badge?: boolean
     visibility?: -1 | 0 | 1
 }
-
+interface mlKitScanner {
+    startScan(success: (value: string) => void, error: (err: string) => void): void
+}
 interface FirebasePlugin {
     getToken(success: (value: string) => void, error: (err: string) => void): void
     onTokenRefresh(success: (value: string) => void, error: (err: string) => void): void

@@ -50,7 +50,9 @@ var parsePluginVariables = function(){
     if(plugin.plugin.preference){
         prefs = prefs.concat(plugin.plugin.preference);
     }
-    plugin.plugin.platform.forEach(function(platform){
+    var a = [];
+    a.push(plugin.plugin.platform);
+    a.forEach(function(platform){
         if(platform.preference){
             prefs = prefs.concat(platform.preference);
         }

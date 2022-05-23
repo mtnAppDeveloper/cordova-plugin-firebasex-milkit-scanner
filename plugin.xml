@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<plugin id="cordova-plugin-firebasex" version="7.0.1"
+<plugin id="cordova-plugin-firebasex-mlkit-scanner" version="7.0.1"
 		xmlns="http://apache.org/cordova/ns/plugins/1.0"
 		xmlns:android="http://schemas.android.com/apk/res/android">
 	<name>Google Firebase Plugin</name>
@@ -25,16 +25,26 @@
 		<js-module name="FirebasePlugin" src="www/firebase.js">
 			<clobbers target="FirebasePlugin" />
 		</js-module>
+
 		<config-file parent="/*" target="res/xml/config.xml">
 			<feature name="FirebasePlugin">
 				<param name="android-package" value="org.apache.cordova.firebase.FirebasePlugin" />
 				<param name="onload" value="true" />
 			</feature>
+			<!--↓ add ml kit -->
+			<feature name="mlKitScanner">
+				<param name="android-package" value="org.apache.cordova.firebase.AndroidScanner" />
+				<param name="onload" value="true" />
+			</feature>
+			<!--↑ add ml kit-->
 		</config-file>
 		<config-file target="AndroidManifest.xml" parent="/*">
 			<uses-permission android:name="android.permission.INTERNET" />
 			<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 			<uses-permission android:name="android.permission.WAKE_LOCK" />
+			<!--↓ add ml kit -->
+			 <uses-permission android:name="android.permission.CAMERA" />
+			 <!--↑ add ml kit-->
 		</config-file>
 		<config-file target="AndroidManifest.xml" parent="application">
 			<service android:enabled="true" android:exported="false" android:name="com.google.android.gms.measurement.AppMeasurementService" />
@@ -49,7 +59,78 @@
 			<meta-data android:name="firebase_analytics_collection_enabled" android:value="$FIREBASE_ANALYTICS_COLLECTION_ENABLED" />
 			<meta-data android:name="firebase_performance_collection_enabled" android:value="$FIREBASE_PERFORMANCE_COLLECTION_ENABLED" />
 			<meta-data android:name="firebase_crashlytics_collection_enabled" android:value="$FIREBASE_CRASHLYTICS_COLLECTION_ENABLED" />
+			<!--↓ add ml kit -->
+			 <meta-data
+                    android:name="com.google.android.gms.version"
+                    android:value="@integer/google_play_services_version" />
+            <meta-data
+                    android:name="com.google.firebase.ml.vision.DEPENDENCIES"
+                    android:value="barcode" />
+
+            <activity android:screenOrientation="portrait" android:label="@string/title_activity_main" android:name="org.apache.cordova.firebase.FirebasePlugin.SecondaryActivity"/>
+            <activity android:screenOrientation="portrait" android:label="Read Barcode" android:name="org.apache.cordova.firebase.FirebasePlugin.BarcodeCaptureActivity" android:theme="@style/Theme.AppCompat.Light"/>
+			<!--↑ add ml kit-->
+
 		</config-file>
+		<!--↓ add ml kit -->
+		<config-file parent="application" target="AndroidManifest.xml">
+            <meta-data
+                    android:name="com.google.android.gms.version"
+                    android:value="@integer/google_play_services_version" />
+            <meta-data
+                    android:name="com.google.firebase.ml.vision.DEPENDENCIES"
+                    android:value="barcode" />
+
+            <activity android:screenOrientation="portrait" android:label="@string/title_activity_main" android:name="org.apache.cordova.firebase.SecondaryActivity"/>
+            <activity android:screenOrientation="portrait" android:label="Read Barcode" android:name="org.apache.cordova.firebase.BarcodeCaptureActivity" android:theme="@style/Theme.AppCompat.Light"/>
+        </config-file>
+		<config-file target="res/values/strings.xml" parent="/*">
+            <string name="ok">OK</string>
+            <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
+            <string name="no_camera_permission">This application cannot run because it does not have the camera permission.  The application will now exit.</string>
+            <string name="low_storage_error">Face detector dependencies cannot be downloaded due to low device storage</string>
+            <string name="title_activity_main">Barcode Reader Activity</string>
+            <string name="barcode_header">Click &quot;Read Barcode&quot; to read a barcode</string>
+            <string name="read_barcode">Read Barcode</string>
+            <string name="auto_focus">Auto Focus</string>
+            <string name="use_flash">Use Flash</string>
+            <string name="barcode_success">Barcode read successfully</string>
+            <string name="barcode_failure">No barcode captured</string>
+            <string name="barcode_error">"Error reading barcode: %1$s"</string>
+        </config-file>
+		<source-file src="src/android/src/BarcodeCaptureActivity.java"
+                     target-dir="src/org/apache/cordova/firebase"/>
+        <source-file src="src/android/src/BarcodeGraphic.java"
+                     target-dir="src/org/apache/cordova/firebase"/>
+        <source-file src="src/android/src/AndroidScanner.java"
+                     target-dir="src/org/apache/cordova/firebase"/>
+        <source-file src="src/android/src/BarcodeScanningProcessor.java"
+                     target-dir="src/org/apache/cordova/firebase"/>
+        <source-file src="src/android/src/SecondaryActivity.java"
+                     target-dir="src/org/apache/cordova/firebase"/>
+
+        <source-file src="src/android/src/camera/CameraSource2.java"
+                     target-dir="src/org/apache/cordova/firebase/camera"/>
+        <source-file src="src/android/src/camera/CameraSourcePreview.java"
+                     target-dir="src/org/apache/cordova/firebase/camera"/>
+        <source-file src="src/android/src/camera/GraphicOverlay.java"
+                     target-dir="src/org/apache/cordova/firebase/camera"/>
+
+        <resource-file src="src/android/res/layout/activity_main.xml"
+                       target="res/layout/activity_barcode_scanner.xml"/>
+        <resource-file src="src/android/res/layout/barcode_capture.xml"
+                       target="res/layout/barcode_capture.xml"/>
+
+        <resource-file src="src/android/res/drawable/flashlight.png"
+                       target="res/drawable/flashlight.png"/>
+        <resource-file src="src/android/res/drawable/horizontal_line.xml" target="res/drawable/horizontal_line.xml"/>
+        <resource-file src="src/android/res/drawable/vertical_line.xml" target="res/drawable/vertical_line.xml"/>
+        <resource-file src="src/android/res/drawable/torch_active.xml"
+                       target="res/drawable/torch_active.xml"/>
+        <resource-file src="src/android/res/drawable/torch_inactive.xml"
+                       target="res/drawable/torch_inactive.xml"/>
+
+        <!--↑ add ml kit-->
 		<resource-file src="src/android/cordova-plugin-firebase-strings.xml" target="res/values/cordova-plugin-firebase-strings.xml" />
 		<source-file src="src/android/FirebasePlugin.java" target-dir="src/org/apache/cordova/firebase" />
 		<source-file src="src/android/OnNotificationOpenReceiver.java" target-dir="src/org/apache/cordova/firebase" />
@@ -58,7 +139,7 @@
 		<source-file src="src/android/FirebasePluginMessageReceiverManager.java" target-dir="src/org/apache/cordova/firebase" />
 		<source-file src="src/android/JavaScriptException.java" target-dir="src/org/apache/cordova/firebase"/>
 
-		<framework src="src/android/build.gradle" custom="true" type="gradleReference" />
+		
 
 		<!-- Default versions for Gradle dependencies -->
 		<preference name="ANDROID_PLAY_SERVICES_TAGMANAGER_VERSION" default="17.0.0" />
@@ -78,6 +159,15 @@
 		<framework src="com.google.firebase:firebase-auth:$ANDROID_FIREBASE_AUTH_VERSION" />
 		<framework src="com.crashlytics.sdk.android:crashlytics:$ANDROID_CRASHLYTICS_VERSION" />
 		<framework src="com.crashlytics.sdk.android:crashlytics-ndk:$ANDROID_CRASHLYTICS_NDK_VERSION" />
+		<!--↓ add ml kit -->
+		<framework src="androidx.appcompat:appcompat:1.1.0" />
+        <framework src="com.google.android.material:material:1.0.0" />
+        <framework src="com.google.firebase:firebase-ml-vision:24.0.3" />
+        <framework src="com.google.firebase:firebase-ml-vision-barcode-model:16.1.1" />
+        <!--↑ add ml kit-->
+		<framework src="src/android/build.gradle" custom="true" type="gradleReference" />
+        
+
 	</platform>
 
 	<platform name="ios">
@@ -92,6 +182,11 @@
 				<param name="ios-package" value="FirebasePlugin" />
 				<param name="onload" value="true" />
 			</feature>
+			<!--↓ add ml kit -->
+			<feature name="mlKitScanner">
+                <param name="ios-package" value="CDViOSScanner"/>
+            </feature>
+			<!--↑ add ml kit-->
 		</config-file>
 		<config-file parent="aps-environment" target="*/Entitlements-Debug.plist">
 			<string>development</string>
@@ -112,6 +207,26 @@
 		<header-file src="src/ios/FirebasePlugin.h" />
 		<source-file src="src/ios/FirebasePlugin.m" />
 
+		<!--↓ add ml kit -->
+		<header-file src="src/ios/CDViOSScanner.h"/>
+        <source-file src="src/ios/CDViOSScanner.m"/>
+        <header-file src="src/ios/CameraViewController.h"/>
+        <source-file src="src/ios/CameraViewController.m"/>
+
+		<framework src="Foundation.framework"/>
+        <framework src="AVFoundation.framework"/>
+		
+		<podspec>
+            <config>
+                <source url="https://github.com/CocoaPods/Specs.git"/>
+            </config>
+            <pods use-frameworks="false">
+                <pod name="FirebaseMLVision" spec="~> 0.19.0" />
+                <pod name="FirebaseMLVisionBarcodeModel" spec="~> 0.19.0" />
+            </pods>
+        </podspec>
+		<!--↑ add ml kit-->
+
 		<podspec>
 			<config>
 				<source url="https://cdn.cocoapods.org/"/>
@@ -128,6 +243,7 @@
 		</podspec>
 
 	</platform>
+
 
 	<hook type="after_prepare" src="scripts/after_prepare.js" />
 </plugin>
